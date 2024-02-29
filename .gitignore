@@ -1,0 +1,8 @@
+# Python
+*.pyc
+*.whl
+/build
+/src/torchrun_jsc.egg-info/
+
+# Archives
+*.tar.gz
