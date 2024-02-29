@@ -26,6 +26,9 @@ import socket
 
 from torch.distributed.elastic.agent.server import api as sapi
 
+from . import arg_patching
+from . import parsing
+
 
 def parse_args():
     parser = ArgumentParser()
