@@ -54,7 +54,7 @@ def fix_get_hostname(host, local_addr):
 def main():
     host, conf, is_host, local_addr = parse_args()
     fix_get_hostname(host, local_addr)
-    arg_patching.fix_is_host(is_host, conf, 'SLURM_PROCID')
+    arg_patching.fix_is_host(is_host, conf)
     runpy.run_module('torch.distributed.run', run_name='__main__')
 
 

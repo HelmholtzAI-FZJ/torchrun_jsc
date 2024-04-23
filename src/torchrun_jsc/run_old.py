@@ -69,7 +69,7 @@ def fix_torch_run(host):
 
 def main():
     host, conf, is_host = parse_args()
-    arg_patching.fix_is_host(is_host, conf, 'SLURM_NODEID')
+    arg_patching.fix_is_host(is_host, conf)
     fix_torch_run(host)
     runpy.run_module('torch.distributed.run', run_name='__main__')
 

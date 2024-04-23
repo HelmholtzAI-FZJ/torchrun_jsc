@@ -6,9 +6,9 @@ import os
 import sys
 
 
-def fix_is_host(is_host, conf, is_host_envvar):
+def fix_is_host(is_host, conf):
     if is_host is None:
-        slurm_is_host = int(os.getenv(is_host_envvar, '0') == '0')
+        slurm_is_host = int(os.getenv('SLURM_NODEID', '0') == '0')
 
         if not conf:
             insertion_index = min(len(sys.argv), 1)
