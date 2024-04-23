@@ -34,8 +34,8 @@ def main():
                 'by `torchrun_jsc`. You may be able to ignore this warning.'
             )
 
-        from .run import main as run_main
-        run_main()
+        from .run_old import main as run_main_old
+        run_main_old()
     elif torch_ver.major == 1 and torch_ver.minor >= 9:
         from .run_old import main as run_main_old
         run_main_old()

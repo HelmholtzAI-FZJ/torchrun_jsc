@@ -1,4 +1,7 @@
 """
+WARNING: Currently broken, do not use. Leads to indeterministic
+deadlocks.
+
 Fixed version of `torchrun` on Jülich Supercomputing Centre for PyTorch
 versions ≥2. Requires Slurm usage.
 
