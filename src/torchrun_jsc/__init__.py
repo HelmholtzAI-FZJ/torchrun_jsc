@@ -36,13 +36,13 @@ def main():
 
         from .run import main as run_main
         run_main()
-    elif torch_ver.major < 1 or torch_ver.major == 1 and torch_ver.minor < 9:
+    elif torch_ver.major == 1 and torch_ver.minor >= 9:
+        from .run_old import main as run_main_old
+        run_main_old()
+    else:
         print(
             'This version of PyTorch is not supported by `torchrun_jsc` '
             'because it does not have the `torchrun` API implemented. '
             'Please use another launch API.'
         )
         exit(1)
-    else:
-        from .run_old import main as run_main_old
-        run_main_old()
