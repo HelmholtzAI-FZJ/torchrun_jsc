@@ -20,6 +20,7 @@ python -m torchrun_jsc.run_old [...]
 """
 
 from argparse import ArgumentParser
+import inspect
 import ipaddress
 import runpy
 import socket
@@ -47,8 +48,11 @@ def parse_args():
 
 def fix_torch_run(host):
     orig_get_fq_hostname = sapi._get_fq_hostname
+    orig_sig = inspect.signature(orig_get_fq_hostname)
 
-    if host:
+    # Do not replace the function if the number of arguments doesn't
+    # match (we expect no arguments in the original version).
+    if host and not orig_sig.parameters:
         try:
             ipaddress.ip_address(host)
             is_ip = True
