@@ -46,7 +46,7 @@ def parse_args():
 
 
 def fix_torch_run(host):
-    _orig_get_fq_hostname = sapi._get_fq_hostname
+    orig_get_fq_hostname = sapi._get_fq_hostname
 
     if host:
         try:
@@ -62,7 +62,7 @@ def fix_torch_run(host):
             def new_get_fq_hostname():
                 return socket.getfqdn(host)
     else:
-        new_get_fq_hostname = _orig_get_fq_hostname
+        new_get_fq_hostname = orig_get_fq_hostname
 
     sapi._get_fq_hostname = new_get_fq_hostname
 
