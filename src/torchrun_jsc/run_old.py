@@ -46,6 +46,24 @@ def parse_args():
     return host, conf, is_host
 
 
+def build_get_fq_hostname_fn(host):
+    assert host
+    try:
+        ipaddress.ip_address(host)
+        is_ip = True
+    except ValueError:
+        is_ip = False
+
+    if is_ip:
+        def get_fq_hostname():
+            return socket.gethostbyaddr(host)[0]
+    else:
+        def get_fq_hostname():
+            return socket.getfqdn(host)
+
+    return get_fq_hostname
+
+
 def fix_torch_run(host):
     orig_get_fq_hostname = sapi._get_fq_hostname
     orig_sig = inspect.signature(orig_get_fq_hostname)
@@ -53,18 +71,7 @@ def fix_torch_run(host):
     # Do not replace the function if the number of arguments doesn't
     # match (we expect no arguments in the original version).
     if host and not orig_sig.parameters:
-        try:
-            ipaddress.ip_address(host)
-            is_ip = True
-        except ValueError:
-            is_ip = False
-
-        if is_ip:
-            def new_get_fq_hostname():
-                return socket.gethostbyaddr(host)[0]
-        else:
-            def new_get_fq_hostname():
-                return socket.getfqdn(host)
+        new_get_fq_hostname = build_get_fq_hostname_fn(host)
     else:
         new_get_fq_hostname = orig_get_fq_hostname
 
