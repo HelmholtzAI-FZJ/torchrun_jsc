@@ -57,7 +57,11 @@ After that, depending on your PyTorch version, there are various modes
 of functionality to achieve that the correct address is used for
 rendezvousing:
 1. PyTorch ≥3: Monkey-patch the function used to obtain the rendezvous
-   hostname and emit a warning.
+   hostname and the function setting up rendezvous metadata and emit a
+   warning.
+2. PyTorch ≥2.4 <3: Monkey-patch the function used to obtain the
+   rendezvous hostname and the function setting up rendezvous
+   metadata.
 3. PyTorch ≥1.9 <3: Monkey-patch the function used to obtain the
    rendezvous hostname.
 4. PyTorch <1.9: If this package is somehow installed for a
