@@ -14,6 +14,7 @@ python -m pip install -U build twine
 ## Packaging and pushing a new version
 
 ```shell
+source env/bin/activate
 python -m build
 python -m twine upload dist/*
 ```
