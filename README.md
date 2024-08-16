@@ -4,7 +4,11 @@ Due to [various issues with the `torchrun`/`torch.distributed.run` API
 on Jülich Supercomputing Centre (JSC)
 systems](https://github.com/pytorch/pytorch/issues/73656), this
 package provides a new launcher called `torchrun_jsc` that wraps the
-old one as a drop-in replacement.
+old one as a drop-in replacement. This package really just provides a
+fixed `torchrun`, so contrary to the name of this package, it is
+portable across all machines. In other words, `torchrun_jsc` supports
+a superset of machines that `torchrun` supports, thus there is no need
+to special-case `torchrun_jsc` in your scripts.
 
 The only requirement for its usage is Slurm and a PyTorch version ≥1.9
 (because earlier versions do not have the `torchrun` API implemented).
