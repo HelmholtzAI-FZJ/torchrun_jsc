@@ -13,7 +13,7 @@ will emit warnings if a PyTorch version ≥3 is used.
 
 ## Installation
 
-### PyPi
+### PyPI
 
 ```shell
 python -m pip install torchrun_jsc
