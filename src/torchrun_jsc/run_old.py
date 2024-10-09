@@ -112,7 +112,7 @@ def fix_torch_run(host):
     sapi._get_fq_hostname = new_get_fq_hostname
 
 
-def fix_torch_run_extra(host):
+def fix_torch_run_rdvz_store_info(host):
     torch_ver = version.parse(torch.__version__)
     assert (
         torch_ver.major >= 3
@@ -153,7 +153,7 @@ def main():
             torch_ver.major >= 3
             or torch_ver.major == 2 and torch_ver.minor >= 4
     ):
-        fix_torch_run_extra(host)
+        fix_torch_run_rdvz_store_info(host)
     runpy.run_module('torch.distributed.run', run_name='__main__')
 
 
