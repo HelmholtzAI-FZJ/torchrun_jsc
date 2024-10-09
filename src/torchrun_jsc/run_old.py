@@ -141,7 +141,7 @@ def main():
     host, conf, is_host = parse_args()
     arg_patching.fix_is_host(is_host, conf)
     fix_torch_run(host)
-    # PyTorch 2.4 introduced a new `RendezvousStoreInfo` that requires
+    # PyTorch 2.4 introduced a new `RendezvousStoreInfo` that requires
     # patching.
     if (
             torch_ver.major >= 3
