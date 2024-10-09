@@ -24,10 +24,10 @@ Tested for PyTorch <2, 2.1.2, 2.4.
 from argparse import ArgumentParser
 import inspect
 import ipaddress
-from packaging import version
 import runpy
 import socket
 
+from packaging import version
 import torch
 from torch.distributed.elastic.agent.server import api as sapi
 from torch.distributed.elastic.rendezvous import api as rapi
