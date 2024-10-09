@@ -71,6 +71,33 @@ def build_get_fq_hostname_fn(host):
     return get_fq_hostname
 
 
+def build_rendezvous_store_info_build_fn(host):
+    get_fq_hostname = build_get_fq_hostname_fn(host)
+
+    def new_build(rank, store):
+        if rank == 0:
+            addr = get_fq_hostname()
+            port = get_free_port()
+            store.set(
+                rapi.RendezvousStoreInfo.MASTER_ADDR_KEY,
+                addr.encode(encoding="UTF-8"),
+            )
+            store.set(
+                rapi.RendezvousStoreInfo.MASTER_PORT_KEY,
+                str(port).encode(encoding="UTF-8"),
+            )
+
+        addr = store.get(
+            rapi.RendezvousStoreInfo.MASTER_ADDR_KEY,
+        ).decode(encoding="UTF-8")
+        port = int(store.get(
+            rapi.RendezvousStoreInfo.MASTER_PORT_KEY,
+        ).decode(encoding="UTF-8"))
+        return rapi.RendezvousStoreInfo(master_addr=addr, master_port=port)
+
+    return new_build
+
+
 def fix_torch_run(host):
     orig_get_fq_hostname = sapi._get_fq_hostname
     orig_sig = inspect.signature(orig_get_fq_hostname)
@@ -105,31 +132,10 @@ def fix_torch_run_extra(host):
     orig_build = rapi.RendezvousStoreInfo.build
     orig_sig = inspect.signature(orig_build)
 
-    get_fq_hostname = build_get_fq_hostname_fn(host)
-
     # Do not replace the function if the number of arguments doesn't
     # match (we expect two arguments in the original version).
     if host and len(orig_sig.parameters) == 2:
-        def new_build(rank, store):
-            if rank == 0:
-                addr = get_fq_hostname()
-                port = get_free_port()
-                store.set(
-                    rapi.RendezvousStoreInfo.MASTER_ADDR_KEY,
-                    addr.encode(encoding="UTF-8"),
-                )
-                store.set(
-                    rapi.RendezvousStoreInfo.MASTER_PORT_KEY,
-                    str(port).encode(encoding="UTF-8"),
-                )
-
-            addr = store.get(
-                rapi.RendezvousStoreInfo.MASTER_ADDR_KEY,
-            ).decode(encoding="UTF-8")
-            port = int(store.get(
-                rapi.RendezvousStoreInfo.MASTER_PORT_KEY,
-            ).decode(encoding="UTF-8"))
-            return rapi.RendezvousStoreInfo(master_addr=addr, master_port=port)
+        new_build = build_rendezvous_store_info_build_fn(host)
     else:
         new_build = orig_build
 
