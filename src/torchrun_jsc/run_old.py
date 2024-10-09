@@ -26,6 +26,7 @@ import inspect
 import ipaddress
 import runpy
 import socket
+import warnings
 
 from packaging import version
 import torch
@@ -93,6 +94,14 @@ def fix_torch_run_extra(host):
         "PyTorch version is too old for applying the "
         "`RendezvousStoreInfo` patch."
     )
+    if not hasattr(rapi, 'RendezvousStoreInfo'):
+        warnings.warn(
+            'This version of PyTorch is not officially supported by '
+            '`torchrun_jsc`; will not apply `RendezvousStoreInfo` patch. You '
+            'may be able to ignore this warning.'
+        )
+        return
+
     orig_build = rapi.RendezvousStoreInfo.build
     orig_sig = inspect.signature(orig_build)
 
