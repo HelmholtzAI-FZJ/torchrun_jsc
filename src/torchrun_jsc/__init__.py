@@ -20,6 +20,8 @@ torchrun_jsc [...]
 ```
 """
 
+import warnings
+
 from packaging import version
 import torch
 
@@ -28,9 +30,9 @@ def main():
     torch_ver = version.parse(torch.__version__)
     if torch_ver.major >= 2:
         if torch_ver.major > 2:
-            print(
-                'WARNING: This version of PyTorch is not officially supported '
-                'by `torchrun_jsc`. You may be able to ignore this warning.'
+            warnings.warn(
+                'This version of PyTorch is not officially supported by '
+                '`torchrun_jsc`. You may be able to ignore this warning.'
             )
 
         from .run_old import main as run_main_old
@@ -39,9 +41,8 @@ def main():
         from .run_old import main as run_main_old
         run_main_old()
     else:
-        print(
+        raise RuntimeError(
             'This version of PyTorch is not supported by `torchrun_jsc` '
             'because it does not have the `torchrun` API implemented. '
             'Please use another launch API.'
         )
-        exit(1)
