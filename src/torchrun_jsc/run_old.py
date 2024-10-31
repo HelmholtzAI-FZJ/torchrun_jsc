@@ -30,6 +30,7 @@ import warnings
 
 from packaging import version
 import torch
+from torch.distributed.argparse_util import check_env, env
 from torch.distributed.elastic.agent.server import api as sapi
 from torch.distributed.elastic.rendezvous import api as rapi
 from torch.distributed.elastic.utils.distributed import get_free_port
@@ -40,9 +41,21 @@ from . import parsing
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument('--standalone', action='store_true')
-    parser.add_argument('--rdzv_endpoint', '--rdzv-endpoint')
-    parser.add_argument('--rdzv_conf', '--rdzv-conf')
+    parser.add_argument('--standalone', action=check_env)
+    parser.add_argument(
+        '--rdzv_endpoint',
+        '--rdzv-endpoint',
+        action=env,
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        '--rdzv_conf',
+        '--rdzv-conf',
+        action=env,
+        type=str,
+        default='',
+    )
     args = parser.parse_known_args()[0]
 
     endpoint = args.rdzv_endpoint

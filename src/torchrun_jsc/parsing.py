@@ -35,7 +35,7 @@ def parse_host(rdzv_endpoint, standalone):
 
 def parse_is_host(rdzv_conf):
     is_host = None
-    if rdzv_conf is not None:
+    if rdzv_conf:
         confs = rdzv_conf.split(',')
         for (key, value) in map(lambda kv: kv.split('=', 1), confs):
             if key == 'is_host':
