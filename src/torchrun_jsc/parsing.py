@@ -22,7 +22,9 @@ def _as_bool(key, value):
     )
 
 
-def parse_host(rdzv_endpoint):
+def parse_host(rdzv_endpoint, standalone):
+    if standalone:
+        return 'localhost'
     host = (
         rdzv_endpoint.rsplit(':', 1)[0]
         if rdzv_endpoint

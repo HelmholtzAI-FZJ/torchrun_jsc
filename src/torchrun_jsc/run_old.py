@@ -40,12 +40,13 @@ from . import parsing
 
 def parse_args():
     parser = ArgumentParser()
+    parser.add_argument('--standalone', action='store_true')
     parser.add_argument('--rdzv_endpoint', '--rdzv-endpoint')
     parser.add_argument('--rdzv_conf', '--rdzv-conf')
     args = parser.parse_known_args()[0]
 
     endpoint = args.rdzv_endpoint
-    host = parsing.parse_host(endpoint)
+    host = parsing.parse_host(endpoint, args.standalone)
 
     conf = args.rdzv_conf
     is_host = parsing.parse_is_host(conf)
