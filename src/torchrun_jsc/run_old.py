@@ -21,7 +21,7 @@ python -m torchrun_jsc.run_old [...]
 Tested for PyTorch <2, 2.1.2, 2.4.
 """
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, REMAINDER
 import inspect
 import ipaddress
 import runpy
@@ -56,6 +56,7 @@ def parse_args():
         type=str,
         default='',
     )
+    parser.add_argument('other_args', nargs=REMAINDER)
     args = parser.parse_known_args()[0]
 
     endpoint = args.rdzv_endpoint
