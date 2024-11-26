@@ -19,7 +19,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "torchrun_jsc = torchrun_jsc.run:main",
+            "torchrun_jsc = torchrun_jsc:main",
         ],
     },
     author='Jan Ebert',
