@@ -92,11 +92,11 @@ def build_rendezvous_store_info_build_fn(host):
     get_fq_hostname = build_get_fq_hostname_fn(host)
 
     torch_ver = version.parse(torch.__version__)
-    if torch_ver.major == 2 and torch_ver.minor >= 4 and torch_ver.minor < 5:
-        def new_build(rank, store):
+    if torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 6:
+        def new_build(rank, store, local_addr, server_port=None):
             if rank == 0:
-                addr = get_fq_hostname()
-                port = get_free_port()
+                addr = local_addr or get_fq_hostname()
+                port = server_port or get_free_port()
                 store.set(
                     rapi.RendezvousStoreInfo.MASTER_ADDR_KEY,
                     addr.encode(encoding="UTF-8"),
@@ -134,11 +134,11 @@ def build_rendezvous_store_info_build_fn(host):
                 rapi.RendezvousStoreInfo.MASTER_PORT_KEY,
             ).decode(encoding="UTF-8"))
             return rapi.RendezvousStoreInfo(master_addr=addr, master_port=port)
-    elif torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 6:
-        def new_build(rank, store, local_addr, server_port=None):
+    elif torch_ver.major == 2 and torch_ver.minor >= 4 and torch_ver.minor < 5:
+        def new_build(rank, store):
             if rank == 0:
-                addr = local_addr or get_fq_hostname()
-                port = server_port or get_free_port()
+                addr = get_fq_hostname()
+                port = get_free_port()
                 store.set(
                     rapi.RendezvousStoreInfo.MASTER_ADDR_KEY,
                     addr.encode(encoding="UTF-8"),
@@ -241,12 +241,12 @@ def fix_torch_run_rdvz_store_info(host):
     orig_build = rapi.RendezvousStoreInfo.build
     orig_sig = inspect.signature(orig_build)
 
-    if torch_ver.major == 2 and torch_ver.minor >= 4 and torch_ver.minor < 5:
-        num_orig_parameters = 2
+    if torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 6:
+        num_orig_parameters = 4
     elif torch_ver.major == 2 and torch_ver.minor >= 5 and torch_ver.minor < 6:
         num_orig_parameters = 3
-    elif torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 6:
-        num_orig_parameters = 4
+    elif torch_ver.major == 2 and torch_ver.minor >= 4 and torch_ver.minor < 5:
+        num_orig_parameters = 2
     else:
         raise AssertionError(
             "PyTorch version is too old for applying the "
