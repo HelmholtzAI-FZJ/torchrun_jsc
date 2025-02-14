@@ -167,7 +167,7 @@ def build_node_desc_generator_generate_fn(host):
     get_fq_hostname = build_get_fq_hostname_fn(host)
 
     torch_ver = version.parse(torch.__version__)
-    if torch_ver.major == 2 and torch_ver.minor >= 5 and torch_ver.minor < 6:
+    if torch_ver.major == 2 and torch_ver.minor >= 5:
         def new_generate(self, local_addr=None):
             with self._lock:
                 local_id = self._local_id
@@ -274,7 +274,7 @@ def fix_torch_run_node_desc_generator(host):
     orig_generate = dynamic_rendezvous._NodeDescGenerator.generate
     orig_sig = inspect.signature(orig_generate)
 
-    if torch_ver.major == 2 and torch_ver.minor >= 5 and torch_ver.minor < 6:
+    if torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 5:
         num_orig_parameters = 2
     else:
         raise AssertionError(
