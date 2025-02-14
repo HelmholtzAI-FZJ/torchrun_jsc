@@ -132,7 +132,7 @@ def build_rendezvous_store_info_build_fn(host):
                 rapi.RendezvousStoreInfo.MASTER_PORT_KEY,
             ).decode(encoding="UTF-8"))
             return rapi.RendezvousStoreInfo(master_addr=addr, master_port=port)
-    elif torch_ver.major == 2 and torch_ver.minor >= 6 or torch_ver.major >= 3:
+    elif torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 6:
         def new_build(rank, store, local_addr, server_port=None):
             if rank == 0:
                 addr = local_addr or get_fq_hostname()
@@ -206,7 +206,7 @@ def fix_torch_run_rdvz_store_info(host):
         num_orig_parameters = 2
     elif torch_ver.major == 2 and torch_ver.minor >= 5 and torch_ver.minor < 6:
         num_orig_parameters = 3
-    elif torch_ver.major == 2 and torch_ver.minor >= 6 or torch_ver.major >= 3:
+    elif torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 6:
         num_orig_parameters = 4
     else:
         raise AssertionError(
