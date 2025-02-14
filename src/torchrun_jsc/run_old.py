@@ -168,7 +168,7 @@ def build_node_desc_generator_generate_fn(host):
     get_fq_hostname = build_get_fq_hostname_fn(host)
 
     torch_ver = version.parse(torch.__version__)
-    if torch_ver.major == 2 and torch_ver.minor >= 5:
+    if torch_ver.major >= 2:
         def new_generate(self, local_addr=None):
             with self._lock:
                 local_id = self._local_id
@@ -177,6 +177,18 @@ def build_node_desc_generator_generate_fn(host):
 
             return dynamic_rendezvous._NodeDesc(
                 local_addr or get_fq_hostname(),
+                os.getpid(),
+                local_id,
+            )
+    elif torch_ver.major == 1 and torch_ver.minor >= 9:
+        def new_generate(self):
+            with self._lock:
+                local_id = self._local_id
+
+                self._local_id += 1
+
+            return dynamic_rendezvous._NodeDesc(
+                get_fq_hostname(),
                 os.getpid(),
                 local_id,
             )
@@ -265,8 +277,8 @@ def fix_torch_run_node_desc_generator(host):
     # let's not bother with checking the function signature and whatnot
     # for now.
     assert (
-        torch_ver.major >= 3
-        or torch_ver.major == 2 and torch_ver.minor >= 5
+        torch_ver.major >= 2
+        or torch_ver.major == 1 and torch_ver.minor >= 9
     ), (
         "PyTorch version is too old for applying the "
         "`_NodeDescGenerator` patch."
@@ -275,8 +287,10 @@ def fix_torch_run_node_desc_generator(host):
     orig_generate = dynamic_rendezvous._NodeDescGenerator.generate
     orig_sig = inspect.signature(orig_generate)
 
-    if torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 5:
+    if torch_ver.major >= 2:
         num_orig_parameters = 2
+    elif torch_ver.major == 1 and torch_ver.minor >= 9:
+        num_orig_parameters = 1
     else:
         raise AssertionError(
             "PyTorch version is too old for applying the "
@@ -314,7 +328,8 @@ def main():
     ):
         fix_torch_run_rdvz_store_info(host)
     # PyTorch 2.5 started to use `_NodeDesc`s for more than just
-    # logging.
+    # logging. Since prior versions don't require this patch, we don't
+    # apply it to decrease the surface of modifications.
     if (
             torch_ver.major >= 3
             or torch_ver.major == 2 and torch_ver.minor >= 5
