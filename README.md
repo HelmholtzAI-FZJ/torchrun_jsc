@@ -20,7 +20,7 @@ will emit warnings if a PyTorch version ≥3 is used.
 ### PyPI
 
 ```shell
-python -m pip install torchrun_jsc
+python -m pip install --no-cache-dir torchrun_jsc
 ```
 
 ### Source
