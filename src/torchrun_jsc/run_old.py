@@ -171,6 +171,12 @@ def fix_torch_run(host):
     if host and not orig_sig.parameters:
         new_get_fq_hostname = build_get_fq_hostname_fn(host)
     else:
+        if orig_sig.parameters:
+            warnings.warn(
+                'The function signature of a function that `torchrun_jsc` '
+                'needs to patch has changed; will not apply `get_fq_hostname` '
+                'patch. You may be able to ignore this warning.'
+            )
         new_get_fq_hostname = orig_get_fq_hostname
 
     sapi._get_fq_hostname = new_get_fq_hostname
@@ -214,6 +220,13 @@ def fix_torch_run_rdvz_store_info(host):
     if host and len(orig_sig.parameters) == num_orig_parameters:
         new_build = build_rendezvous_store_info_build_fn(host)
     else:
+        if len(orig_sig.parameters) != num_orig_parameters:
+            warnings.warn(
+                'The function signature of a function that `torchrun_jsc` '
+                'needs to patch has changed; will not apply '
+                '`RendezvousStoreInfo` patch. You may be able to ignore '
+                'this warning.'
+            )
         new_build = orig_build
 
     rapi.RendezvousStoreInfo.build = new_build
