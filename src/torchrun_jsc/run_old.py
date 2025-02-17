@@ -271,7 +271,7 @@ def fix_torch_run_rdvz_store_info(host):
     rapi.RendezvousStoreInfo.build = new_build
 
 
-def fix_torch_run_node_desc_generator(host):
+def fix_torch_run_node_desc_generator(is_host, host):
     torch_ver = version.parse(torch.__version__)
     # We could actually apply the patch to older versions, too, but
     # let's not bother with checking the function signature and whatnot
@@ -283,6 +283,12 @@ def fix_torch_run_node_desc_generator(host):
         "PyTorch version is too old for applying the "
         "`_NodeDescGenerator` patch."
     )
+
+    # If we're not on the host node, don't change anything. If we did,
+    # other nodes would obtain the same address as the host node, which
+    # we don't want.
+    if not is_host:
+        return
 
     orig_generate = dynamic_rendezvous._NodeDescGenerator.generate
     orig_sig = inspect.signature(orig_generate)
@@ -318,7 +324,7 @@ def fix_torch_run_node_desc_generator(host):
 def main():
     torch_ver = version.parse(torch.__version__)
     host, conf, is_host = parse_args()
-    arg_patching.fix_is_host(is_host, conf)
+    is_host = arg_patching.fix_is_host(is_host, conf)
     fix_torch_run(host)
     # PyTorch 2.4 introduced a new `RendezvousStoreInfo` that requires
     # patching.
@@ -334,7 +340,7 @@ def main():
             torch_ver.major >= 3
             or torch_ver.major == 2 and torch_ver.minor >= 5
     ):
-        fix_torch_run_node_desc_generator(host)
+        fix_torch_run_node_desc_generator(is_host, host)
     runpy.run_module('torch.distributed.run', run_name='__main__')
 
 
