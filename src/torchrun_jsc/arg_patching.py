@@ -7,15 +7,15 @@ import sys
 
 
 def fix_is_host(is_host, conf):
-    slurm_nodeid = os.getenv('SLURM_NODEID')
+    nodeid = os.getenv('TORCHRUN_JSC_NODE_RANK', os.getenv('SLURM_NODEID'))
 
     # If `is_host` was already specified in the `torchrun`
     # configuration, we won't overwrite it.
-    # If `SLURM_NODEID` is not set, it means we have no information so
-    # we better not touch anything.
-    if is_host is None and slurm_nodeid is not None:
+    # If we could not obtain a `nodeid`, it means we have no information
+    # so we better not touch anything.
+    if is_host is None and nodeid is not None:
         # Now we check ourselves if we are the host.
-        is_host = int(slurm_nodeid == '0')
+        is_host = int(nodeid == os.getenv('TORCHRUN_JSC_HOST_NODE_RANK', '0'))
 
         if not conf:
             insertion_index = min(len(sys.argv), 1)

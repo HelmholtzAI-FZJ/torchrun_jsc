@@ -50,6 +50,19 @@ python -m torchrun_jsc [...]
 Please remember to use `srun` to start your Python processes,
 otherwise necessary Slurm variables will not be set.
 
+### Advanced usage
+
+If you are not using Slurm or cannot rely on its environment
+variables, you can configure the following environment variables to
+customize `torchrun_jsc`'s behavior:
+
+- `TORCHRUN_JSC_NODE_RANK`: should be set to the executing node's
+  rank. Defaults to the value of `SLURM_NODEID`; if that variable
+  isn't set either, behavior depending on this value is ignored.
+- `TORCHRUN_JSC_HOST_NODE_RANK`: should be set to the node rank of the
+  host node (i.e., the one that is listed as the rendezvous endpoint).
+  Defaults to `0`.
+
 ## How does it work?
 
 First, the `torchrun_jsc` launcher will always patch `torchrun`'s
