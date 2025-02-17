@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='torchrun_jsc',
     python_requires='>=3.6,<4',
-    version='0.0.14',
+    version='0.0.15',
     install_requires=[
         'packaging',
         # PyTorch 1.9 introduced the `torchrun` API.
