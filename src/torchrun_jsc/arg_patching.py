@@ -8,7 +8,12 @@ import sys
 
 def fix_is_host(is_host, conf):
     if is_host is None:
-        slurm_is_host = int(os.getenv('SLURM_NODEID', '0') == '0')
+        slurm_nodeid = os.getenv('SLURM_NODEID')
+        if slurm_nodeid is None:
+            # We have no information so we better not touch anything.
+            return
+
+        slurm_is_host = int(slurm_nodeid == '0')
 
         if not conf:
             insertion_index = min(len(sys.argv), 1)
