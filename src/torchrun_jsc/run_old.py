@@ -201,7 +201,7 @@ def build_node_desc_generator_generate_fn(host):
     return new_generate
 
 
-def fix_torch_run(host):
+def fix_torch_run_simple_elastic_agent(host):
     orig_get_fq_hostname = sapi._get_fq_hostname
     orig_sig = inspect.signature(orig_get_fq_hostname)
 
@@ -325,7 +325,7 @@ def main():
     torch_ver = version.parse(torch.__version__)
     host, conf, is_host = parse_args()
     is_host = arg_patching.fix_is_host(is_host, conf)
-    fix_torch_run(host)
+    fix_torch_run_simple_elastic_agent(host)
     # PyTorch 2.4 introduced a new `RendezvousStoreInfo` that requires
     # patching.
     if (
