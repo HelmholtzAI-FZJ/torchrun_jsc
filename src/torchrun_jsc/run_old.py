@@ -325,7 +325,12 @@ def main():
     torch_ver = version.parse(torch.__version__)
     host, conf, is_host = parse_args()
     is_host = arg_patching.fix_is_host(is_host, conf)
-    fix_torch_run_simple_elastic_agent(host)
+    # Since PyTorch 2.4, we no longer need to fix `_get_fq_hostname`.
+    if (
+            torch_ver.major == 2 and torch_ver.minor <= 3
+            or torch_ver.major == 1 and torch_ver.minor >= 9
+    ):
+        fix_torch_run_simple_elastic_agent(host)
     # PyTorch 2.4 introduced a new `RendezvousStoreInfo` that requires
     # patching.
     if (
