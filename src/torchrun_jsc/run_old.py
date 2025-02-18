@@ -22,6 +22,7 @@ Tested for PyTorch <2, 2.1.2, 2.4, 2.5.1, 2.6.0.
 """
 
 from argparse import ArgumentParser, REMAINDER
+import os
 import runpy
 
 from packaging import version
@@ -64,7 +65,10 @@ def parse_args():
 def main():
     torch_ver = version.parse(torch.__version__)
     host, conf, is_host = parse_args()
-    is_host = patching.fix_is_host(is_host, conf)
+    if bool(int(os.getenv('TORCHRUN_JSC_PREFER_ARG_PATCHING', '1'))):
+        is_host = patching.fix_is_host(is_host, conf)
+    else:
+        is_host = patching.fix_torch_run_matches_machine_hostname()
     # Since PyTorch 2.4, we no longer need to fix `_get_fq_hostname`.
     if (
             torch_ver.major == 2 and torch_ver.minor <= 3

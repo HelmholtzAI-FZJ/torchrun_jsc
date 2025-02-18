@@ -56,6 +56,14 @@ If you are not using Slurm or cannot rely on its environment
 variables, you can configure the following environment variables to
 customize `torchrun_jsc`'s behavior:
 
+- `TORCHRUN_JSC_PREFER_ARG_PATCHING`: whether to use argument patching
+  or an alternative monkey-patching method. The alternative method
+  does not rely on Slurm but adds another surface for breakage because
+  it depends on private, internal PyTorch APIs. Also, the alternative
+  method is not portable and may not be supported on your system. If
+  this is set to `0`, `TORCHRUN_JSC_NODE_RANK` and
+  `TORCHRUN_JSC_HOST_NODE_RANK` (see below for both) will not be used.
+  Defaults to `1` ("true", i.e., use argument patching).
 - `TORCHRUN_JSC_NODE_RANK`: should be set to the executing node's
   rank. Defaults to the value of `SLURM_NODEID`; if that variable
   isn't set either, behavior depending on this value is ignored.
