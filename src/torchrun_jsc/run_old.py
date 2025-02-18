@@ -23,10 +23,8 @@ Tested for PyTorch <2, 2.1.2, 2.4, 2.5.1, 2.6.0.
 
 from argparse import ArgumentParser, REMAINDER
 import inspect
-import ipaddress
 import os
 import runpy
-import socket
 import warnings
 
 from packaging import version
@@ -38,6 +36,7 @@ from torch.distributed.elastic.rendezvous import dynamic_rendezvous
 from torch.distributed.elastic.utils.distributed import get_free_port
 
 from . import arg_patching
+from . import hostname_utils
 from . import parsing
 
 
@@ -70,26 +69,8 @@ def parse_args():
     return host, conf, is_host
 
 
-def build_get_fq_hostname_fn(host):
-    assert host
-    try:
-        ipaddress.ip_address(host)
-        is_ip = True
-    except ValueError:
-        is_ip = False
-
-    if is_ip:
-        def get_fq_hostname():
-            return socket.gethostbyaddr(host)[0]
-    else:
-        def get_fq_hostname():
-            return socket.getfqdn(host)
-
-    return get_fq_hostname
-
-
 def build_rendezvous_store_info_build_fn(host):
-    get_fq_hostname = build_get_fq_hostname_fn(host)
+    get_fq_hostname = hostname_utils.build_get_fq_hostname_fn(host)
 
     torch_ver = version.parse(torch.__version__)
     if torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 6:
@@ -165,7 +146,7 @@ def build_rendezvous_store_info_build_fn(host):
 
 
 def build_node_desc_generator_generate_fn(host):
-    get_fq_hostname = build_get_fq_hostname_fn(host)
+    get_fq_hostname = hostname_utils.build_get_fq_hostname_fn(host)
 
     torch_ver = version.parse(torch.__version__)
     if torch_ver.major >= 2:
@@ -208,7 +189,7 @@ def fix_torch_run_simple_elastic_agent(host):
     # Do not replace the function if the number of arguments doesn't
     # match (we expect no arguments in the original version).
     if host and not orig_sig.parameters:
-        new_get_fq_hostname = build_get_fq_hostname_fn(host)
+        new_get_fq_hostname = hostname_utils.build_get_fq_hostname_fn(host)
     else:
         if orig_sig.parameters:
             warnings.warn(
