@@ -1,4 +1,4 @@
-from .arg_patching import fix_is_host
+from .arg_patching import fix_is_host, fix_local_addr
 from .matches_machine_hostname_patching import (
     fix_torch_run_matches_machine_hostname,
 )
