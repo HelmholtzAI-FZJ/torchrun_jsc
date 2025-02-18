@@ -18,7 +18,7 @@ python /path/to/torchrun_jsc/run_old.py [...]
 python -m torchrun_jsc.run_old [...]
 ```
 
-Tested for PyTorch <2, 2.1.2, 2.4, 2.6.
+Tested for PyTorch <2, 2.1.2, 2.4, 2.5.1, 2.6.0.
 """
 
 from argparse import ArgumentParser, REMAINDER
