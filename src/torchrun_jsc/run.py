@@ -22,23 +22,47 @@ python -m torchrun_jsc.run [...]
 ```
 """
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, REMAINDER
 import runpy
 import sys
 
-from . import arg_patching
+from torch.distributed.argparse_util import check_env, env
+
 from . import parsing
+from . import patching
 
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument('--rdzv_endpoint', '--rdzv-endpoint')
-    parser.add_argument('--rdzv_conf', '--rdzv-conf')
-    parser.add_argument('--local_addr', '--local-addr')
+    parser.add_argument('--standalone', action=check_env)
+    parser.add_argument(
+        '--rdzv_endpoint',
+        '--rdzv-endpoint',
+        action=env,
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        '--rdzv_conf',
+        '--rdzv-conf',
+        action=env,
+        type=str,
+        default='',
+    )
+    # This inconsistent ordering is adapted for easier comparison with
+    # the source.
+    parser.add_argument(
+        "--local-addr",
+        "--local_addr",
+        default=None,
+        type=str,
+        action=env,
+    )
+    parser.add_argument('other_args', nargs=REMAINDER)
     args = parser.parse_known_args()[0]
 
     endpoint = args.rdzv_endpoint
-    host = parsing.parse_host(endpoint)
+    host = parsing.parse_host(endpoint, args.standalone)
 
     conf = args.rdzv_conf
     is_host = parsing.parse_is_host(conf)
@@ -48,16 +72,10 @@ def parse_args():
     return host, conf, is_host, local_addr
 
 
-def fix_get_hostname(host, local_addr):
-    if host and not local_addr:
-        insertion_index = min(len(sys.argv), 1)
-        sys.argv.insert(insertion_index, f'--local_addr={host}')
-
-
 def main():
     host, conf, is_host, local_addr = parse_args()
-    fix_get_hostname(host, local_addr)
-    arg_patching.fix_is_host(is_host, conf)
+    is_host = patching.fix_is_host(is_host, conf)
+    patching.fix_local_addr(is_host, host, local_addr)
     runpy.run_module('torch.distributed.run', run_name='__main__')
 
 

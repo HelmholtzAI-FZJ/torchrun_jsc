@@ -51,3 +51,9 @@ def fix_is_host(is_host, conf):
                 break
 
     return is_host
+
+
+def fix_local_addr(is_host, host, local_addr):
+    if is_host and host and not local_addr:
+        insertion_index = min(len(sys.argv), 1)
+        sys.argv.insert(insertion_index, f'--local_addr={host}')
