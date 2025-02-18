@@ -6,7 +6,7 @@ from packaging import version
 import torch
 from torch.distributed.elastic.rendezvous import dynamic_rendezvous
 
-from . import hostname_utils
+from .. import hostname_utils
 
 
 def build_node_desc_generator_generate_fn(host):

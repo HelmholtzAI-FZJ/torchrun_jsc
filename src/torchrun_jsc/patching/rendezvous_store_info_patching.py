@@ -6,7 +6,7 @@ import torch
 from torch.distributed.elastic.rendezvous import api as rapi
 from torch.distributed.elastic.utils.distributed import get_free_port
 
-from . import hostname_utils
+from .. import hostname_utils
 
 
 def build_rendezvous_store_info_build_fn(host):

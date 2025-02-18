@@ -3,7 +3,7 @@ import warnings
 
 from torch.distributed.elastic.agent.server import api as sapi
 
-from . import hostname_utils
+from .. import hostname_utils
 
 
 def fix_torch_run_simple_elastic_agent(host):
