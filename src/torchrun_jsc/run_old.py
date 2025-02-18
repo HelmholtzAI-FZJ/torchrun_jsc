@@ -71,7 +71,7 @@ def main():
         is_host = patching.fix_torch_run_matches_machine_hostname()
     # Since PyTorch 2.4, we no longer need to fix `_get_fq_hostname`.
     if (
-            torch_ver.major == 2 and torch_ver.minor <= 3
+            torch_ver.major == 2 and torch_ver.minor < 4
             or torch_ver.major == 1 and torch_ver.minor >= 9
     ):
         patching.fix_torch_run_simple_elastic_agent(host)
