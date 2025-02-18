@@ -30,13 +30,13 @@ import warnings
 from packaging import version
 import torch
 from torch.distributed.argparse_util import check_env, env
-from torch.distributed.elastic.agent.server import api as sapi
 from torch.distributed.elastic.rendezvous import dynamic_rendezvous
 
 from . import arg_patching
 from . import hostname_utils
 from . import parsing
 from . import rendezvous_store_info_patching
+from . import simple_elastic_agent_patching
 
 
 def parse_args():
@@ -105,26 +105,6 @@ def build_node_desc_generator_generate_fn(host):
     return new_generate
 
 
-def fix_torch_run_simple_elastic_agent(host):
-    orig_get_fq_hostname = sapi._get_fq_hostname
-    orig_sig = inspect.signature(orig_get_fq_hostname)
-
-    # Do not replace the function if the number of arguments doesn't
-    # match (we expect no arguments in the original version).
-    if host and not orig_sig.parameters:
-        new_get_fq_hostname = hostname_utils.build_get_fq_hostname_fn(host)
-    else:
-        if orig_sig.parameters:
-            warnings.warn(
-                'The function signature of a function that `torchrun_jsc` '
-                'needs to patch has changed; will not apply `get_fq_hostname` '
-                'patch. You may be able to ignore this warning.'
-            )
-        new_get_fq_hostname = orig_get_fq_hostname
-
-    sapi._get_fq_hostname = new_get_fq_hostname
-
-
 def fix_torch_run_node_desc_generator(is_host, host):
     torch_ver = version.parse(torch.__version__)
     # We could actually apply the patch to older versions, too, but
@@ -184,7 +164,7 @@ def main():
             torch_ver.major == 2 and torch_ver.minor <= 3
             or torch_ver.major == 1 and torch_ver.minor >= 9
     ):
-        fix_torch_run_simple_elastic_agent(host)
+        simple_elastic_agent_patching.fix_torch_run_simple_elastic_agent(host)
     # PyTorch 2.4 introduced a new `RendezvousStoreInfo` that requires
     # patching.
     if (
