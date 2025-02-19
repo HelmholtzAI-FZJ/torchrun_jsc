@@ -1,6 +1,6 @@
 """
 Fixed version of `torchrun` on Jülich Supercomputing Centre for PyTorch
-versions <2. Requires Slurm usage.
+versions <2.
 
 To use, modify your execution like the following:
 
