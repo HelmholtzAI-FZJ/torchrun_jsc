@@ -77,21 +77,32 @@ not using Slurm or cannot rely on its environment variables.
 
 ## How does it work?
 
-First, the `torchrun_jsc` launcher will always patch `torchrun`'s
-`--rdzv_conf` argument's `is_host` configuration so that the correct
-process is recognized as the host process for setting up the
-communication server.
+First, if `TORCHRUN_JSC_PREFER_ARG_PATCHING=1` (the default), the
+`torchrun_jsc` launcher will patch `torchrun`'s `--rdzv_conf`
+argument's `is_host` configuration so that the correct process is
+recognized as the host process for setting up the communication
+server. If `TORCHRUN_JSC_PREFER_ARG_PATCHING=0`, the function for
+recognizing the host machine will be patched.
 
 After that, depending on your PyTorch version, there are various modes
 of functionality to achieve that the correct address is used for
 rendezvousing:
-1. PyTorch ≥3: Monkey-patch the function used to obtain the rendezvous
-   hostname, the function setting up rendezvous metadata, the function
-   setting up node metadata, and emit a warning.
-2. PyTorch ≥2.5 <3: Monkey-patch the function used to obtain the
-   rendezvous hostname, the function setting up rendezvous metadata,
-   and the function setting up node metadata. (With minor differences
-   in the patching depending on the PyTorch version.)
+1. PyTorch ≥3:
+   - If using "new solution": Additionally patch the `--local_addr`
+     argument on the host node to be the same as the given rendezvous
+     endpoint and emit a warning.
+   - If using "old solution": Monkey-patch the function used to obtain
+     the rendezvous hostname, the function setting up rendezvous
+     metadata, the function setting up node metadata, and emit a
+     warning.
+2. PyTorch ≥2.5 <3:
+   - If using "new solution": Additionally patch the `--local_addr`
+     argument on the host node to be the same as the given rendezvous
+     endpoint.
+   - If using "old solution": Monkey-patch the function used to obtain
+     the rendezvous hostname, the function setting up rendezvous
+     metadata, and the function setting up node metadata. (With minor
+     differences in the patching depending on the PyTorch version.)
 3. PyTorch ≥2.4 <2.5: Monkey-patch the function used to obtain the
    rendezvous hostname and the function setting up rendezvous
    metadata. (With minor differences in the patching depending on the
