@@ -25,7 +25,10 @@ python -m torchrun_jsc.run [...]
 from argparse import ArgumentParser, REMAINDER
 import os
 import runpy
+import warnings
 
+from packaging import version
+import torch
 from torch.distributed.argparse_util import check_env, env
 
 from . import parsing
@@ -73,6 +76,16 @@ def parse_args():
 
 
 def main():
+    torch_ver = version.parse(torch.__version__)
+    if (
+            torch_ver.major == 2 and torch_ver.minor < 5
+            or torch_ver.major < 2
+    ):
+        warnings.warn(
+            'This version of PyTorch is not officially supported by '
+            '`torchrun_jsc`. You may be able to ignore this warning.'
+        )
+
     host, conf, is_host, local_addr = parse_args()
     if bool(int(os.getenv('TORCHRUN_JSC_PREFER_ARG_PATCHING', '1'))):
         is_host = patching.fix_is_host(is_host, conf)
