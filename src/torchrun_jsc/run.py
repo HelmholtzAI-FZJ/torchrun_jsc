@@ -24,7 +24,6 @@ python -m torchrun_jsc.run [...]
 
 from argparse import ArgumentParser, REMAINDER
 import runpy
-import sys
 
 from torch.distributed.argparse_util import check_env, env
 
