@@ -23,6 +23,7 @@ python -m torchrun_jsc.run [...]
 """
 
 from argparse import ArgumentParser, REMAINDER
+import os
 import runpy
 
 from torch.distributed.argparse_util import check_env, env
@@ -73,7 +74,12 @@ def parse_args():
 
 def main():
     host, conf, is_host, local_addr = parse_args()
-    is_host = patching.fix_is_host(is_host, conf)
+    if bool(int(os.getenv('TORCHRUN_JSC_PREFER_ARG_PATCHING', '1'))):
+        is_host = patching.fix_is_host(is_host, conf)
+    else:
+        new_matches_machine_hostname = \
+            patching.fix_torch_run_matches_machine_hostname()
+        is_host = new_matches_machine_hostname(host)
     patching.fix_local_addr(is_host, host, local_addr)
     runpy.run_module('torch.distributed.run', run_name='__main__')
 
