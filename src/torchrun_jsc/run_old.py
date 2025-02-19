@@ -1,6 +1,6 @@
 """
 Fixed version of `torchrun` on Jülich Supercomputing Centre for PyTorch
-versions <2.
+versions <2.5.
 
 To use, modify your execution like the following:
 
