@@ -75,3 +75,4 @@ def fix_torch_run_matches_machine_hostname():
         return is_match
 
     rutils._matches_machine_hostname = new_matches_machine_hostname
+    return new_matches_machine_hostname

@@ -68,7 +68,9 @@ def main():
     if bool(int(os.getenv('TORCHRUN_JSC_PREFER_ARG_PATCHING', '1'))):
         is_host = patching.fix_is_host(is_host, conf)
     else:
-        is_host = patching.fix_torch_run_matches_machine_hostname()
+        new_matches_machine_hostname = \
+            patching.fix_torch_run_matches_machine_hostname()
+        is_host = new_matches_machine_hostname(host)
     # Since PyTorch 2.4, we no longer need to fix `_get_fq_hostname`.
     if (
             torch_ver.major == 2 and torch_ver.minor < 4
