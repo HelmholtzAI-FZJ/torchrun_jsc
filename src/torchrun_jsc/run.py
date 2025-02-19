@@ -1,7 +1,4 @@
 """
-WARNING: Currently broken, do not use. Leads to indeterministic
-deadlocks.
-
 Fixed version of `torchrun` on Jülich Supercomputing Centre for PyTorch
 versions ≥2.5.
 
@@ -20,6 +17,8 @@ python /path/to/torchrun_jsc/run.py [...]
 # or if `torchrun_jsc` is on `PYTHONPATH`
 python -m torchrun_jsc.run [...]
 ```
+
+Tested for PyTorch 2.5.0, 2.6.0.
 """
 
 from argparse import ArgumentParser, REMAINDER
