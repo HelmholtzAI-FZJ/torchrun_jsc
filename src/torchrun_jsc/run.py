@@ -87,12 +87,7 @@ def main():
         )
 
     host, conf, is_host, local_addr = parse_args()
-    if bool(int(os.getenv('TORCHRUN_JSC_PREFER_ARG_PATCHING', '1'))):
-        is_host = patching.fix_is_host(is_host, conf)
-    else:
-        new_matches_machine_hostname = \
-            patching.fix_torch_run_matches_machine_hostname()
-        is_host = new_matches_machine_hostname(host)
+    is_host = patching.fix_host_check(is_host, conf, host)
     patching.fix_local_addr(is_host, host, local_addr)
     runpy.run_module('torch.distributed.run', run_name='__main__')
 
