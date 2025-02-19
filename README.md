@@ -52,9 +52,9 @@ otherwise necessary Slurm variables will not be set.
 
 ### Advanced usage
 
-If you are not using Slurm or cannot rely on its environment
-variables, you can configure the following environment variables to
-customize `torchrun_jsc`'s behavior:
+You can configure the following environment variables to customize
+`torchrun_jsc`'s behavior. This can, for example, be useful if you are
+not using Slurm or cannot rely on its environment variables.
 
 - `TORCHRUN_JSC_PREFER_ARG_PATCHING`: whether to use argument patching
   or an alternative monkey-patching method. The alternative method
@@ -70,6 +70,10 @@ customize `torchrun_jsc`'s behavior:
 - `TORCHRUN_JSC_HOST_NODE_RANK`: should be set to the node rank of the
   host node (i.e., the one that is listed as the rendezvous endpoint).
   Defaults to `0`.
+- `TORCHRUN_JSC_PREFER_OLD_SOLUTION`: whether to always use an old
+  patching solution even if it could be avoided. The new solution is
+  less intrusive, but only available for PyTorch ≥2.5. Defaults to `0`
+  ("false", i.e., do not use the old solution unless necessary).
 
 ## How does it work?
 

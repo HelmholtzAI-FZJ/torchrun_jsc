@@ -20,6 +20,7 @@ torchrun_jsc [...]
 ```
 """
 
+import os
 import warnings
 
 from packaging import version
@@ -28,15 +29,19 @@ import torch
 
 def main():
     torch_ver = version.parse(torch.__version__)
-    if torch_ver.major >= 2:
+    if torch_ver.major > 2 or torch_ver.major == 2 and torch_ver.minor >= 5:
         if torch_ver.major > 2:
             warnings.warn(
                 'This version of PyTorch is not officially supported by '
                 '`torchrun_jsc`. You may be able to ignore this warning.'
             )
 
-        from .run_old import main as run_main_old
-        run_main_old()
+        if bool(int(os.getenv('TORCHRUN_JSC_PREFER_OLD_SOLUTION', '0'))):
+            from .run_old import main as run_main_old
+            run_main_old()
+        else:
+            from .run import main as run_main
+            run_main()
     elif torch_ver.major == 1 and torch_ver.minor >= 9:
         from .run_old import main as run_main_old
         run_main_old()
