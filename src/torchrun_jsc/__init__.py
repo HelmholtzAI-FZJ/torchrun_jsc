@@ -42,7 +42,7 @@ def main():
         else:
             from .run import main as run_main
             run_main()
-    elif torch_ver.major == 1 and torch_ver.minor >= 9:
+    elif torch_ver.major == 2 or torch_ver.major == 1 and torch_ver.minor >= 9:
         from .run_old import main as run_main_old
         run_main_old()
     else:
