@@ -22,7 +22,6 @@ Tested for PyTorch <2, 2.1.2, 2.4, 2.5.1, 2.6.0.
 """
 
 from argparse import ArgumentParser, REMAINDER
-import os
 import runpy
 
 from packaging import version
