@@ -24,6 +24,8 @@ import os
 import warnings
 
 from . import patching
+from .run import main as run_main
+from .run_old import main as run_main_old
 
 
 def main():
@@ -36,13 +38,10 @@ def main():
             )
 
         if bool(int(os.getenv('TORCHRUN_JSC_PREFER_OLD_SOLUTION', '0'))):
-            from .run_old import main as run_main_old
             run_main_old()
         else:
-            from .run import main as run_main
             run_main()
     elif torch_ver.major == 2 or torch_ver.major == 1 and torch_ver.minor >= 9:
-        from .run_old import main as run_main_old
         run_main_old()
     else:
         raise RuntimeError(
