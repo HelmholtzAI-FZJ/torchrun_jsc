@@ -1,7 +1,8 @@
-from packaging import version
-import torch
+from importlib.metadata import version as importlib_metadata_version
+
+from packaging import version as packaging_version
 
 
 def get_torch_ver():
-    torch_ver = version.parse(torch.__version__)
+    torch_ver = packaging_version.parse(importlib_metadata_version('torch'))
     return torch_ver
