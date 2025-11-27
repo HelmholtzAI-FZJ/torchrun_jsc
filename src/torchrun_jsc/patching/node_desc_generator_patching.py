@@ -1,3 +1,4 @@
+import functools
 import inspect
 import os
 import warnings
@@ -13,6 +14,7 @@ from .. import hostname_utils
 
 def build_node_desc_generator_generate_fn(host):
     get_fq_hostname = hostname_utils.build_get_fq_hostname_fn(host)
+    orig_generate = dynamic_rendezvous._NodeDescGenerator.generate
 
     torch_ver = utils.get_torch_ver()
     if torch_ver.major >= 2:
@@ -21,6 +23,7 @@ def build_node_desc_generator_generate_fn(host):
             "`_NodeDescGenerator` patch."
         )
 
+        @functools.wraps(orig_generate)
         def new_generate(self, local_addr=None):
             with self._lock:
                 local_id = self._local_id
@@ -36,6 +39,7 @@ def build_node_desc_generator_generate_fn(host):
         # This should never raise.
         assert dynamic_rendezvous is not None
 
+        @functools.wraps(orig_generate)
         def new_generate(self):
             with self._lock:
                 local_id = self._local_id

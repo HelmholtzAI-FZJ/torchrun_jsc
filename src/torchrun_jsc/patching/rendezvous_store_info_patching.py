@@ -1,3 +1,4 @@
+import functools
 import inspect
 import warnings
 
@@ -43,6 +44,7 @@ from .. import hostname_utils
 
 def build_rendezvous_store_info_build_fn(host):
     get_fq_hostname = hostname_utils.build_get_fq_hostname_fn(host)
+    orig_build = rapi.RendezvousStoreInfo.build
 
     torch_ver = utils.get_torch_ver()
     if torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 6:
@@ -51,6 +53,7 @@ def build_rendezvous_store_info_build_fn(host):
             "`RendezvousStoreInfo` patch."
         )
 
+        @functools.wraps(orig_build)
         def new_build(rank, store, local_addr, server_port=None):
             if rank == 0:
                 addr = local_addr or get_fq_hostname()
@@ -75,6 +78,7 @@ def build_rendezvous_store_info_build_fn(host):
         # This should never raise.
         assert rapi is not None
 
+        @functools.wraps(orig_build)
         def new_build(rank, store, local_addr):
             if rank == 0:
                 addr = local_addr or get_fq_hostname()
@@ -99,6 +103,7 @@ def build_rendezvous_store_info_build_fn(host):
         # This should never raise.
         assert rapi is not None
 
+        @functools.wraps(orig_build)
         def new_build(rank, store):
             if rank == 0:
                 addr = get_fq_hostname()
