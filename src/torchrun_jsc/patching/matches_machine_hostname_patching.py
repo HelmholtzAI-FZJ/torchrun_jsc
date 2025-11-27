@@ -50,10 +50,10 @@ def fix_torch_run_matches_machine_hostname():
         )
         return
 
-    old_matches_machine_hostname = rutils._matches_machine_hostname
+    orig_matches_machine_hostname = rutils._matches_machine_hostname
 
     def new_matches_machine_hostname(host):
-        is_match = old_matches_machine_hostname(host)
+        is_match = orig_matches_machine_hostname(host)
 
         try:
             addr = ipaddress.ip_address(host)
