@@ -20,11 +20,19 @@ torchrun_jsc [...]
 ```
 """
 
+from importlib.metadata import PackageNotFoundError, version
 import os
 import warnings
 
 from . import patching
 from . import run
+
+try:
+    __version__ = version(__package__ if __package__ else 'torchrun_jsc')
+except PackageNotFoundError:
+    # In this case, we can live without setting the optional
+    # `__version__` variable.
+    pass
 
 
 def apply_fixes(strict=True):
