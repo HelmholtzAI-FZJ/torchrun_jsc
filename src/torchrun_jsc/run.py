@@ -22,9 +22,7 @@ Tested for PyTorch 2.5.0, 2.6.0.
 """
 
 import runpy
-import warnings
 
-from . import parsing
 from . import patching
 
 
@@ -33,19 +31,7 @@ def torch_run_main():
 
 
 def main():
-    torch_ver = patching.get_torch_ver()
-    if (
-            torch_ver.major == 2 and torch_ver.minor < 5
-            or torch_ver.major < 2
-    ):
-        warnings.warn(
-            'This version of PyTorch is not officially supported by '
-            '`torchrun_jsc`. You may be able to ignore this warning.'
-        )
-
-    host, conf, is_host, local_addr = parsing.parse_args()
-    is_host = patching.fix_host_check(is_host, conf, host)
-    patching.fix_local_addr(is_host, host, local_addr)
+    patching.fix_torch_run()
     torch_run_main()
 
 
