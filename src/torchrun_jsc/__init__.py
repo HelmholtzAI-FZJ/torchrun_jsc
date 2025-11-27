@@ -24,11 +24,11 @@ import os
 import warnings
 
 from . import patching
-from .run import main as run_main
-from .run_old import main as run_main_old
+from . import run
 
 
-def main():
+def apply_fixes(strict=True):
+    is_supported_torch_version = True
     torch_ver = patching.get_torch_ver()
     if torch_ver.major > 2 or torch_ver.major == 2 and torch_ver.minor >= 5:
         if torch_ver.major > 2:
@@ -38,14 +38,24 @@ def main():
             )
 
         if bool(int(os.getenv('TORCHRUN_JSC_PREFER_OLD_SOLUTION', '0'))):
-            run_main_old()
+            patching.fix_torch_run_old()
         else:
-            run_main()
+            patching.fix_torch_run()
     elif torch_ver.major == 2 or torch_ver.major == 1 and torch_ver.minor >= 9:
-        run_main_old()
+        patching.fix_torch_run_old()
     else:
+        # Applying fixes failed due to too old PyTorch version.
+        is_supported_torch_version = False
+
+    if strict and not is_supported_torch_version:
         raise RuntimeError(
             'This version of PyTorch is not supported by `torchrun_jsc` '
             'because it does not have the `torchrun` API implemented. '
             'Please use another launch API.'
         )
+    return is_supported_torch_version
+
+
+def main():
+    apply_fixes()
+    run.torch_run_main()
