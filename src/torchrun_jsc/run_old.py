@@ -21,49 +21,18 @@ python -m torchrun_jsc.run_old [...]
 Tested for PyTorch <2, 2.1.2, 2.4, 2.5.1, 2.6.0.
 """
 
-from argparse import ArgumentParser, REMAINDER
 import runpy
 
 from packaging import version
 import torch
-from torch.distributed.argparse_util import check_env, env
 
 from . import parsing
 from . import patching
 
 
-def parse_args():
-    parser = ArgumentParser()
-    parser.add_argument('--standalone', action=check_env)
-    parser.add_argument(
-        '--rdzv_endpoint',
-        '--rdzv-endpoint',
-        action=env,
-        type=str,
-        default='',
-    )
-    parser.add_argument(
-        '--rdzv_conf',
-        '--rdzv-conf',
-        action=env,
-        type=str,
-        default='',
-    )
-    parser.add_argument('other_args', nargs=REMAINDER)
-    args = parser.parse_known_args()[0]
-
-    endpoint = args.rdzv_endpoint
-    host = parsing.parse_host(endpoint, args.standalone)
-
-    conf = args.rdzv_conf
-    is_host = parsing.parse_is_host(conf)
-
-    return host, conf, is_host
-
-
 def main():
     torch_ver = version.parse(torch.__version__)
-    host, conf, is_host = parse_args()
+    host, conf, is_host = parsing.parse_args_old()
     is_host = patching.fix_host_check(is_host, conf, host)
     # Since PyTorch 2.4, we no longer need to fix `_get_fq_hostname`.
     if (
