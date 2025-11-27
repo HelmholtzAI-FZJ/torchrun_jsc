@@ -31,6 +31,10 @@ from . import parsing
 from . import patching
 
 
+def torch_run_main():
+    runpy.run_module('torch.distributed.run', run_name='__main__')
+
+
 def main():
     torch_ver = version.parse(torch.__version__)
     if (
@@ -45,7 +49,7 @@ def main():
     host, conf, is_host, local_addr = parsing.parse_args()
     is_host = patching.fix_host_check(is_host, conf, host)
     patching.fix_local_addr(is_host, host, local_addr)
-    runpy.run_module('torch.distributed.run', run_name='__main__')
+    torch_run_main()
 
 
 if __name__ == '__main__':

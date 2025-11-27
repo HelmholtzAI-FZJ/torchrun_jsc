@@ -21,13 +21,12 @@ python -m torchrun_jsc.run_old [...]
 Tested for PyTorch <2, 2.1.2, 2.4, 2.5.1, 2.6.0.
 """
 
-import runpy
-
 from packaging import version
 import torch
 
 from . import parsing
 from . import patching
+from . import run
 
 
 def main():
@@ -60,7 +59,7 @@ def main():
             is_host,
             host,
         )
-    runpy.run_module('torch.distributed.run', run_name='__main__')
+    run.torch_run_main()
 
 
 if __name__ == '__main__':
