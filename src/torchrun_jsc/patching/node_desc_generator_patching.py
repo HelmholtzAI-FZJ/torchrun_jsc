@@ -2,7 +2,10 @@ import inspect
 import os
 import warnings
 
-from torch.distributed.elastic.rendezvous import dynamic_rendezvous
+try:
+    from torch.distributed.elastic.rendezvous import dynamic_rendezvous
+except (ModuleNotFoundError, ImportError):
+    dynamic_rendezvous = None
 
 from . import utils
 from .. import hostname_utils
@@ -13,6 +16,11 @@ def build_node_desc_generator_generate_fn(host):
 
     torch_ver = utils.get_torch_ver()
     if torch_ver.major >= 2:
+        assert dynamic_rendezvous is not None, (
+            "PyTorch version is too new for applying the "
+            "`_NodeDescGenerator` patch."
+        )
+
         def new_generate(self, local_addr=None):
             with self._lock:
                 local_id = self._local_id
@@ -25,6 +33,9 @@ def build_node_desc_generator_generate_fn(host):
                 local_id,
             )
     elif torch_ver.major == 1 and torch_ver.minor >= 9:
+        # This should never raise.
+        assert dynamic_rendezvous is not None
+
         def new_generate(self):
             with self._lock:
                 local_id = self._local_id
@@ -57,6 +68,13 @@ def fix_torch_run_node_desc_generator(is_host, host):
         "PyTorch version is too old for applying the "
         "`_NodeDescGenerator` patch."
     )
+    if dynamic_rendezvous is None:
+        warnings.warn(
+            'This version of PyTorch is not officially supported by '
+            '`torchrun_jsc`; will not apply `_NodeDescGenerator` patch. You '
+            'may be able to ignore this warning.'
+        )
+        return
 
     # If we're not on the host node, don't change anything. If we did,
     # other nodes would obtain the same address as the host node, which

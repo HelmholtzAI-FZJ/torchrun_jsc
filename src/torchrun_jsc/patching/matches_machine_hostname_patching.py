@@ -3,8 +3,12 @@ import ipaddress
 import socket
 import struct
 from typing import List, Tuple
+import warnings
 
-from torch.distributed.elastic.rendezvous import utils as rutils
+try:
+    from torch.distributed.elastic.rendezvous import utils as rutils
+except (ModuleNotFoundError, ImportError):
+    rutils = None
 
 
 # From https://stackoverflow.com/a/27494105.
@@ -38,6 +42,14 @@ def nic_info() -> List[Tuple[str, str]]:
 
 
 def fix_torch_run_matches_machine_hostname():
+    if rutils is None:
+        warnings.warn(
+            'This version of PyTorch is not officially supported by '
+            '`torchrun_jsc`; will not apply `matches_machine_hostname` patch. '
+            'You may be able to ignore this warning.'
+        )
+        return
+
     old_matches_machine_hostname = rutils._matches_machine_hostname
 
     def new_matches_machine_hostname(host):

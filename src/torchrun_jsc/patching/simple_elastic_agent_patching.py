@@ -1,12 +1,23 @@
 import inspect
 import warnings
 
-from torch.distributed.elastic.agent.server import api as sapi
+try:
+    from torch.distributed.elastic.agent.server import api as sapi
+except (ModuleNotFoundError, ImportError):
+    sapi = None
 
 from .. import hostname_utils
 
 
 def fix_torch_run_simple_elastic_agent(host):
+    if sapi is None:
+        warnings.warn(
+            'This version of PyTorch is not officially supported by '
+            '`torchrun_jsc`; will not apply `get_fq_hostname` patch. '
+            'You may be able to ignore this warning.'
+        )
+        return
+
     orig_get_fq_hostname = sapi._get_fq_hostname
     orig_sig = inspect.signature(orig_get_fq_hostname)
 
