@@ -2,17 +2,16 @@ import inspect
 import os
 import warnings
 
-from packaging import version
-import torch
 from torch.distributed.elastic.rendezvous import dynamic_rendezvous
 
+from . import utils
 from .. import hostname_utils
 
 
 def build_node_desc_generator_generate_fn(host):
     get_fq_hostname = hostname_utils.build_get_fq_hostname_fn(host)
 
-    torch_ver = version.parse(torch.__version__)
+    torch_ver = utils.get_torch_ver()
     if torch_ver.major >= 2:
         def new_generate(self, local_addr=None):
             with self._lock:
@@ -47,7 +46,7 @@ def build_node_desc_generator_generate_fn(host):
 
 
 def fix_torch_run_node_desc_generator(is_host, host):
-    torch_ver = version.parse(torch.__version__)
+    torch_ver = utils.get_torch_ver()
     # We could actually apply the patch to older versions, too, but
     # let's not bother with checking the function signature and whatnot
     # for now.

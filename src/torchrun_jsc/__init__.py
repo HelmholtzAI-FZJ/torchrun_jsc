@@ -23,12 +23,11 @@ torchrun_jsc [...]
 import os
 import warnings
 
-from packaging import version
-import torch
+from . import patching
 
 
 def main():
-    torch_ver = version.parse(torch.__version__)
+    torch_ver = patching.get_torch_ver()
     if torch_ver.major > 2 or torch_ver.major == 2 and torch_ver.minor >= 5:
         if torch_ver.major > 2:
             warnings.warn(

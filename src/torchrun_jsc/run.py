@@ -24,9 +24,6 @@ Tested for PyTorch 2.5.0, 2.6.0.
 import runpy
 import warnings
 
-from packaging import version
-import torch
-
 from . import parsing
 from . import patching
 
@@ -36,7 +33,7 @@ def torch_run_main():
 
 
 def main():
-    torch_ver = version.parse(torch.__version__)
+    torch_ver = patching.get_torch_ver()
     if (
             torch_ver.major == 2 and torch_ver.minor < 5
             or torch_ver.major < 2

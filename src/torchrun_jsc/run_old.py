@@ -21,16 +21,13 @@ python -m torchrun_jsc.run_old [...]
 Tested for PyTorch <2, 2.1.2, 2.4, 2.5.1, 2.6.0.
 """
 
-from packaging import version
-import torch
-
 from . import parsing
 from . import patching
 from . import run
 
 
 def main():
-    torch_ver = version.parse(torch.__version__)
+    torch_ver = patching.get_torch_ver()
     host, conf, is_host = parsing.parse_args_old()
     is_host = patching.fix_host_check(is_host, conf, host)
     # Since PyTorch 2.4, we no longer need to fix `_get_fq_hostname`.

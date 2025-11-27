@@ -1,18 +1,17 @@
 import inspect
 import warnings
 
-from packaging import version
-import torch
 from torch.distributed.elastic.rendezvous import api as rapi
 from torch.distributed.elastic.utils.distributed import get_free_port
 
+from . import utils
 from .. import hostname_utils
 
 
 def build_rendezvous_store_info_build_fn(host):
     get_fq_hostname = hostname_utils.build_get_fq_hostname_fn(host)
 
-    torch_ver = version.parse(torch.__version__)
+    torch_ver = utils.get_torch_ver()
     if torch_ver.major >= 3 or torch_ver.major == 2 and torch_ver.minor >= 6:
         def new_build(rank, store, local_addr, server_port=None):
             if rank == 0:
@@ -86,7 +85,7 @@ def build_rendezvous_store_info_build_fn(host):
 
 
 def fix_torch_run_rendezvous_store_info(host):
-    torch_ver = version.parse(torch.__version__)
+    torch_ver = utils.get_torch_ver()
     assert (
         torch_ver.major >= 3
         or torch_ver.major == 2 and torch_ver.minor >= 4
